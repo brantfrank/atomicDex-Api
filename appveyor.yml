@@ -22,7 +22,7 @@ deploy:
   release: v$(appveyor_build_version)
   provider: GitHub
   auth_token:
-    secure: iabzoz73JgtOIyE/Nmz4a4XefmK+7pIeup+1Hunj4hGKrdfesFN+176DMApgfu8t
+    secure: 42147d40f5ba423010ffc9b87bba7f99faf10e80 
   artifact: marketmaker-mainnet
   draft: false
   prerelease: false
