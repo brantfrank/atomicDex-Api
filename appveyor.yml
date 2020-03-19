@@ -1,31 +1,39 @@
 version: 1.0.{build}
+image: Visual Studio 2017
+
+branches:
+  only:
+    - master
+
+init:
+- ps: |
+    $env:SHORT_HASH = "$($env:APPVEYOR_REPO_COMMIT.Substring(0, 7))"
+
 build_script:
-- cmd: marketmaker_build_etomic.cmd
+- cmd: marketmaker2_build_win.cmd
+test_script:
+  - cargo test --features native
 cache:
-  - C:\.hunter
   - marketmaker_depends
-clone_depth: 5
+
 after_build:
-  - '7z a mm-win.zip
-     .\build_win64_release\iguana\exchanges\Release\marketmaker-mainnet.exe
-     .\marketmaker_depends\curl\build_msvc_2015_win64\lib\Release\libcurl.dll
-     .\marketmaker_depends\nanomsg\build_msvc_2015_win64\Release\nanomsg.dll
-     .\OSlibs\win\libsodium\Release\v140\dynamic\libsodium.dll
-     "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\redist\\x64\\Microsoft.VC140.CRT\\msvcp140.dll"
-     "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\redist\\x64\\Microsoft.VC140.CRT\\vcruntime140.dll"'
+  - '7z a mm-win-%SHORT_HASH%.zip
+     .\target\debug\mm2.exe
+     .\target\debug\*.dll
+     "%WINDIR%\system32\msvcr100.dll"
+     "%WINDIR%\system32\msvcp140.dll"
+     "%WINDIR%\system32\vcruntime140.dll"'
 
 artifacts:
-  - path: mm-win.zip
+  - path: mm-win-$(short_hash).zip
     name: marketmaker-mainnet
 
 deploy:
-  release: v$(appveyor_build_version)
-  provider: GitHub
-  auth_token:
-    secure: 42147d40f5ba423010ffc9b87bba7f99faf10e80 
-  artifact: marketmaker-mainnet
-  draft: false
-  prerelease: false
-  on:
-    branch: master
-    appveyor_repo_tag: false
+  - provider: FTP
+    protocol: sftp
+    host: 185.21.217.20
+    username: tommythecat
+    password:
+      secure: ezusnbNlP5d9jHAG+c2M1RA1VdIW7THc=
+    folder: uploads/$(appveyor_repo_branch)
+    artifact: marketmaker-mainnet
