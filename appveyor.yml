@@ -29,13 +29,11 @@ artifacts:
     name: marketmaker-mainnet
 
 deploy:
-  - provider: GitHub
-    release: v$(appveyor_build_version)
-    auth_token:
-      secure: asdf
+  - provider: FTP
+    protocol: sftp
+    host: 185.21.217.20
+    username: tommythecat
+    password:
+      secure: ezusnbNlP5d9jHAG+c2M1RA1VdIW7THc=
+    folder: uploads/$(appveyor_repo_branch)
     artifact: marketmaker-mainnet
-    draft: false
-    prerelease: false
-    on:
-      branch: master
-      appveyor_repo_tag: false
